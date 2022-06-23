@@ -221,7 +221,6 @@ class ViewController: UIViewController {
         containerStack.spacing = 10
         containerStack.anchor(left: view.safeAreaLayoutGuide.leftAnchor, bottom: view.safeAreaLayoutGuide.bottomAnchor, right: view.safeAreaLayoutGuide.rightAnchor, paddingLeft: 10, paddingBottom: 10, paddingRight: 10)
         
-        btn0.anchor(right: btn2.rightAnchor, paddingRight: 0)
         btnDot.anchor(left: btn3.leftAnchor, right: btn3.rightAnchor, paddingLeft: 0, paddingRight: 0)
         btnEqual.anchor(left: btnPlus.leftAnchor, right: btnPlus.rightAnchor, paddingLeft: 0, paddingRight: 0)
         
