@@ -245,9 +245,15 @@ class ViewController: UIViewController {
         
         if isInTyping {
             if let currentNumber = numberLabel.text {
+                if btnTitle == "." && currentNumber.contains(".") {
+                    return
+                }
                 numberLabel.text = currentNumber + btnTitle
             }
         } else {
+            if btnTitle == "." {
+                return
+            }
             numberLabel.text = btnTitle
         }
         
