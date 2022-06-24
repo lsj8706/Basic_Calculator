@@ -9,6 +9,8 @@ import UIKit
 
 class ViewController: UIViewController {
     
+    //MARK: - Properties
+    
     // 계속 숫자를 기입중인지 체킹
     var isInTyping: Bool = false
     // 연산자 저장
@@ -20,6 +22,18 @@ class ViewController: UIViewController {
     var prev: Double = 0
     var result: Double = 0
     
+    var displayValue: Double {
+        get {
+            if let currentNumber = numberLabel.text?.replacingOccurrences(of: ",", with: "") {
+                let number = Double(currentNumber)!
+                return number
+            }
+            return 0
+        }
+        set {
+            numberLabel.text = makeNumberToStringWithComma(value: newValue)
+        }
+    }
     
     private lazy var numberLabel: UILabel = {
         let label = UILabel()
@@ -170,11 +184,25 @@ class ViewController: UIViewController {
         return btn
     }()
     
+    
+    //MARK: - Life cycle
     override func viewDidLoad() {
         super.viewDidLoad()
         configureUI()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        let Btns: [UIButton] = [btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, btnDiv, btnMul, btnMinus, btnPlus, btnAC, btnChange, btnPercent, btn0, btnDot, btnEqual]
+        for btn in Btns {
+            if btn == btn0 {
+                btn.layer.cornerRadius = btn.frame.width / 4
+            } else {
+                btn.layer.cornerRadius = btn.frame.width / 2
+            }
+        }
+    }
+    
+    //MARK: - Helpers
     func configureUI() {
         view.backgroundColor = .black
         
@@ -229,27 +257,38 @@ class ViewController: UIViewController {
         numberLabel.anchor(left: view.safeAreaLayoutGuide.leftAnchor, bottom: containerStack.topAnchor, right: view.safeAreaLayoutGuide.rightAnchor, paddingLeft: 20, paddingBottom: 20, paddingRight: 20)
     }
     
-    override func viewDidAppear(_ animated: Bool) {
-        let Btns: [UIButton] = [btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8, btn9, btnDiv, btnMul, btnMinus, btnPlus, btnAC, btnChange, btnPercent, btn0, btnDot, btnEqual]
-        for btn in Btns {
-            if btn == btn0 {
-                btn.layer.cornerRadius = btn.frame.width / 4
-            } else {
-                btn.layer.cornerRadius = btn.frame.width / 2
-            }
+    func makeNumberToStringWithComma(value: Double) -> String {
+        let numberFormatter = NumberFormatter()
+        numberFormatter.numberStyle = .decimal
+        numberFormatter.maximumSignificantDigits = 10
+        
+        var formattedNumber = "0"
+        
+        if floor(value) == value {
+            let intValue = Int(value)
+            formattedNumber = numberFormatter.string(from: NSNumber(value: intValue)) ?? "0"
+        } else {
+            formattedNumber = numberFormatter.string(from: NSNumber(value: value)) ?? "0"
         }
+        return formattedNumber
     }
     
+    //MARK: - Actions
     
     @objc func handleDigitBtnTap(sender: UIButton) {
         guard let btnTitle = sender.currentTitle else { return }
         
         if isInTyping {
-            if let currentNumber = numberLabel.text {
+            if let currentNumber = numberLabel.text?.replacingOccurrences(of: ",", with: "") {
                 if btnTitle == "." && currentNumber.contains(".") {
                     return
                 }
-                numberLabel.text = currentNumber + btnTitle
+                let numberFormatter = NumberFormatter()
+                numberFormatter.numberStyle = .decimal
+                let strNumber = currentNumber + btnTitle
+                let doubleNumber = Double(strNumber)!
+
+                numberLabel.text = numberFormatter.string(from: NSNumber(value: doubleNumber))
             }
         } else {
             if btnTitle == "." {
@@ -262,40 +301,38 @@ class ViewController: UIViewController {
     }
     
     func calculate() {
-        guard let currentNumber = numberLabel.text else { return }
         if isDiv {
-            result = prev / Double(currentNumber)!
+            result = prev / displayValue
             isDiv = false
         }
 
         if isMul {
-            result = prev * Double(currentNumber)!
+            result = prev * displayValue
             isMul = false
         }
 
         if isMinus {
-            result = prev - Double(currentNumber)!
+            result = prev - displayValue
             isMinus = false
         }
 
         if isPlus {
-            result = prev + Double(currentNumber)!
+            result = prev + displayValue
             isPlus = false
         }
         
-        setNumberLabel(result)
+        displayValue = result
     }
     
     @objc func handleOperatorBtnTap(sender: UIButton) {
         guard let btnTitle = sender.currentTitle else { return }
-        guard let currentNumber = numberLabel.text else { return }
         isInTyping = false
         
         if isDiv || isMul || isMinus || isPlus {
             calculate()
             prev = result
         } else {
-            prev = Double(currentNumber)!
+            prev = displayValue
         }
         
         
@@ -333,31 +370,14 @@ class ViewController: UIViewController {
         isPlus = false
         
         result = 0
-        numberLabel.text = "0"
+        displayValue = 0
     }
     
     @objc func handlePercentBtnTap(sender: UIButton) {
-        guard let currentNumber = numberLabel.text else { return }
-        let newNumber = Double(currentNumber)! * 0.01
-        
-        numberLabel.text = String(newNumber)
+        displayValue *= 0.01
     }
     
     @objc func handleChangeBtnTap(sender: UIButton) {
-        guard let currentNumber = numberLabel.text else { return }
-        
-        let newNumber = Double(currentNumber)! * -1
-        
-        setNumberLabel(newNumber)
-    }
-    
-    func setNumberLabel(_ value: Double) {
-        let isInt = floor(value) == value
-        
-        if isInt {
-            numberLabel.text = String(Int(value))
-        } else {
-            numberLabel.text = String(value)
-        }
+        displayValue *= -1
     }
 }
