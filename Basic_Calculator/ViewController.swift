@@ -20,6 +20,7 @@ class ViewController: UIViewController {
     var prev: Double = 0
     var result: Double = 0
     
+    
     private lazy var numberLabel: UILabel = {
         let label = UILabel()
         label.text = "0"
@@ -260,33 +261,38 @@ class ViewController: UIViewController {
         isInTyping = true
     }
     
+    func calculate() {
+        guard let currentNumber = numberLabel.text else { return }
+        if isDiv {
+            result = prev / Double(currentNumber)!
+            isDiv = false
+        }
+
+        if isMul {
+            result = prev * Double(currentNumber)!
+            isMul = false
+        }
+
+        if isMinus {
+            result = prev - Double(currentNumber)!
+            isMinus = false
+        }
+
+        if isPlus {
+            result = prev + Double(currentNumber)!
+            isPlus = false
+        }
+        
+        setNumberLabel(result)
+    }
+    
     @objc func handleOperatorBtnTap(sender: UIButton) {
         guard let btnTitle = sender.currentTitle else { return }
         guard let currentNumber = numberLabel.text else { return }
         isInTyping = false
         
         if isDiv || isMul || isMinus || isPlus {
-            if isDiv {
-                result = prev / Double(currentNumber)!
-                isDiv = false
-            }
-
-            if isMul {
-                result = prev * Double(currentNumber)!
-                isMul = false
-            }
-
-            if isMinus {
-                result = prev - Double(currentNumber)!
-                isMinus = false
-            }
-
-            if isPlus {
-                result = prev + Double(currentNumber)!
-                isPlus = false
-            }
-            
-            setNumberLabel(result)
+            calculate()
             prev = result
         } else {
             prev = Double(currentNumber)!
@@ -316,29 +322,7 @@ class ViewController: UIViewController {
     }
     
     @objc func handleEqualBtnTap(sender: UIButton) {
-        guard let currentNumber = numberLabel.text else { return }
-        
-        if isDiv {
-            result = prev / Double(currentNumber)!
-            isDiv = false
-        }
-
-        if isMul {
-            result = prev * Double(currentNumber)!
-            isMul = false
-        }
-
-        if isMinus {
-            result = prev - Double(currentNumber)!
-            isMinus = false
-        }
-
-        if isPlus {
-            result = prev + Double(currentNumber)!
-            isPlus = false
-        }
-        
-        setNumberLabel(result)
+        calculate()
     }
 
     @objc func handleACBtnTap(sender: UIButton) {
