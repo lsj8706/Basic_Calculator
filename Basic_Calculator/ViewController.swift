@@ -40,6 +40,7 @@ class ViewController: UIViewController {
         label.text = "0"
         label.textColor = .white
         label.font = .systemFont(ofSize: 80)
+        label.numberOfLines = 1
         label.adjustsFontSizeToFitWidth = true
         label.minimumScaleFactor = 0.25
         label.textAlignment = .right
